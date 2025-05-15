@@ -1,26 +1,54 @@
-import { IsString, IsEmail, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  MinLength,
+  MaxLength,
+  Matches,
+  IsNotEmpty,
+  IsNumber,
+} from 'class-validator';
 
 export class CreateUserDto {
-  @IsEmail()
-  email: string;
-
+  @IsNotEmpty()
   @IsString()
+  @MinLength(3)
+  @MaxLength(80)
   name: string;
 
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,15}$/, {
+    message:
+      'Password must include upper/lowercase letters, a number, a special character (!@#$%^&*), and be 8-15 characters long',
+  })
   @IsString()
+  @MinLength(8)
+  @MaxLength(15)
   password: string;
 
   @IsString()
+  @IsNotEmpty()
+  @MinLength(3)
+  @MaxLength(80)
   address: string;
 
-  @IsString()
-  phone: string;
+  @IsNumber()
+  @IsNotEmpty()
+  phone: number;
 
-  @IsOptional()
   @IsString()
-  country?: string;
+  @IsNotEmpty()
+  @MinLength(5)
+  @MaxLength(20)
+  country: string;
 
-  @IsOptional()
   @IsString()
-  city?: string;
+  @IsNotEmpty()
+  @MinLength(5)
+  @MaxLength(20)
+  city: string;
 }
+

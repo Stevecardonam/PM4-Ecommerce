@@ -1,18 +1,33 @@
-import { IsString, IsNumber, IsBoolean } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsBoolean,
+  IsNotEmpty,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateProductDto {
+  @IsNotEmpty()
   @IsString()
-  name: string;
+  name?: string;
 
+  @IsNotEmpty()
   @IsString()
-  description: string;
+  description?: string;
 
+  @IsNotEmpty()
   @IsNumber()
-  price: number;
+  price?: number;
 
+  @IsNotEmpty()
   @IsBoolean()
-  stock: boolean;
+  stock?: number;
 
+  @IsOptional()
   @IsString()
-  imgUrl: string;
+  imgUrl?: string;
+
+  @IsUUID()
+  categoryId: string;
 }

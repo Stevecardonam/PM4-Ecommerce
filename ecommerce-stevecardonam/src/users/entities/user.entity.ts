@@ -10,35 +10,38 @@ export class Users {
 
   @Column('varchar', {
     length: 50,
-    nullable: false,
   })
   name: string;
 
   @Column('varchar', {
     length: 50,
-    nullable: false,
     unique: true,
   })
   email: string;
 
   @Column('varchar', {
     length: 70,
-    nullable: false,
   })
   password: string;
 
-  @Column('bigint')
+  @Column('bigint', {
+    nullable: true,
+  })
   phone: number;
 
   @Column('varchar', {
+    nullable: true,
     length: 50,
   })
   country: string;
 
-  @Column('text')
+  @Column('text', {
+    nullable: true,
+  })
   address: string;
 
   @Column('varchar', {
+    nullable: true,
     length: 50,
   })
   city: string;

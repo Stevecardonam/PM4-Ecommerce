@@ -19,35 +19,29 @@ export class Products {
   @Column('varchar', {
     length: 50,
     unique: true,
-    nullable: false,
   })
   name: string;
 
-  @Column('text', {
-    nullable: false,
-  })
+  @Column('text')
   description: string;
 
   @Column('decimal', {
     precision: 10,
-    scale: 2, // corregido
-    nullable: false,
+    scale: 2,
   })
   price: number;
 
-  @Column('int', {
-    nullable: false,
-  })
+  @Column('int')
   stock: number;
 
   @Column('text', {
-    nullable: false,
+    default: 'No image',
   })
   imgUrl: string;
 
   @ManyToOne(() => Categories, (category) => category.products)
   @JoinColumn({ name: 'category_id' })
-  category: Categories; // corregido: no es un array
+  category: Categories; 
 
   @ManyToMany(() => OrderDetails, (orderDetails) => orderDetails.products)
   orderDetails: OrderDetails[];

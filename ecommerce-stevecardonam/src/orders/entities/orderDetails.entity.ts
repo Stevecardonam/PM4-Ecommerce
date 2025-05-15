@@ -1,6 +1,14 @@
-import { Products } from 'src/products/entities/product.entity';
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  OneToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { Orders } from './order.entity';
+import { Products } from 'src/products/entities/product.entity';
 
 @Entity({
   name: 'ORDER_DETAILS',
