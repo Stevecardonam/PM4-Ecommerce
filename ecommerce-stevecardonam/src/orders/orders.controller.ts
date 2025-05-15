@@ -28,8 +28,7 @@ export class OrdersController {
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
     const { userId, products } = createOrderDto;
-    const productsIds = products.map((p) => p.id);
-    return this.ordersService.create(userId, productsIds);
+    return this.ordersService.create(userId, products);
   }
 
   @Put(':id')

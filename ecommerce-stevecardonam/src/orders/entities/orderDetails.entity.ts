@@ -5,7 +5,7 @@ import {
   JoinTable,
   ManyToMany,
   OneToOne,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Orders } from './order.entity';
 import { Products } from 'src/products/entities/product.entity';
@@ -14,7 +14,7 @@ import { Products } from 'src/products/entities/product.entity';
   name: 'ORDER_DETAILS',
 })
 export class OrderDetails {
-  @PrimaryColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({

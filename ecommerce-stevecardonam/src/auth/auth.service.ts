@@ -1,39 +1,63 @@
-// import { Injectable, UnauthorizedException } from '@nestjs/common';
-// import { UsersService } from '../users/users.service';
-// import { JwtService } from '@nestjs/jwt';
-// import * as bcrypt from 'bcrypt';
-// import { LoginUserDto } from './dto/login-user.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { Users } from 'src/users/entities/user.entity';
+import { CreateUserDto, LoginDto } from 'src/users/dto/create-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
-// @Injectable()
-// export class AuthService {
-//   constructor(
-//     private readonly usersService: UsersService,
-//     private readonly jwtService: JwtService,
-//   ) {}
+@Injectable()
+export class AuthService {
+  constructor(
+    @InjectRepository(Users) private readonly userRepository: Repository<Users>,
+    private readonly jwtService: JwtService,
+  ) {}
 
-//   async validateUser(email: string, password: string) {
-//     const user = await this.usersService.findByEmail(email);
-//     if (!user) throw new UnauthorizedException('Credenciales inválidas');
+  async signUp(user: CreateUserDto) {
+    const { confirmPassword, ...userWithoutPassword } = user;
 
-//     const isMatch = await bcrypt.compare(password, user.password);
-//     if (!isMatch) throw new UnauthorizedException('Credenciales inválidas');
+    const findUser = await this.userRepository.findOneBy({ email: user.email });
 
-//     return user;
-//   }
+    if (findUser) {
+      throw new BadRequestException('User already exists');
+    }
 
-//   async login(loginDto: LoginUserDto) {
-//     const user = await this.validateUser(loginDto.email, loginDto.password);
+    const hashedPassword = await bcrypt.hash(user.password, 10);
 
-//     const payload = { sub: user.id, email: user.email };
-//     const token = await this.jwtService.signAsync(payload);
+    const newUser = await this.userRepository.save({
+      ...userWithoutPassword,
+      password: hashedPassword,
+    });
 
-//     return {
-//       access_token: token,
-//       user: {
-//         id: user.id,
-//         email: user.email,
-//         name: user.name,
-//       },
-//     };
-//   }
-// }
+    const { password, ...cleanUser } = newUser;
+    return cleanUser;
+  }
+
+  async signIn(credentials: LoginDto) {
+    const findUser = await this.userRepository.findOneBy({
+      email: credentials.email,
+    });
+
+    if (!findUser) {
+      throw new BadRequestException('Invalid Credentials');
+    }
+
+    const passwordMatch = await bcrypt.compare(
+      credentials.password,
+      findUser.password,
+    );
+
+    if (!passwordMatch) {
+      throw new BadRequestException('Invalid Credentials');
+    }
+
+    const payload = {
+      id: findUser.id,
+      email: findUser.email,
+      isAdmin: findUser.isAdmin,
+    };
+
+    const token = this.jwtService.sign(payload);
+    return { access_token: token };
+  }
+}

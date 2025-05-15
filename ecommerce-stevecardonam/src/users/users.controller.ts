@@ -8,15 +8,22 @@ import {
   Delete,
   Query,
   ParseUUIDPipe,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthService } from 'src/auth/auth.service';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+  ) {}
 
+  @UseGuards(AuthGuard)
   @Get()
   getUsers(@Query('page') page = 1, @Query('limit') limit = 5) {
     return this.usersService.getUsers(page, limit);
@@ -25,14 +32,6 @@ export class UsersController {
   @Get(':id')
   getUser(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.getUser(id);
-  }
-
-  @Post()
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    const newUser = await this.usersService.createUser(createUserDto);
-    return {
-      id: newUser.id,
-    };
   }
 
   @Put(':id')
