@@ -11,6 +11,7 @@ import { JwtModule } from '@nestjs/jwt';
 import typeorm from './config/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
+import { FileUploadModule } from './file-upload/file-upload.module';
 
 @Module({
   imports: [
@@ -32,8 +33,9 @@ import { LoggerMiddleware } from './middlewares/logger.middleware';
     }),
     OrdersModule,
     CategoriesModule,
+    FileUploadModule,
   ],
   controllers: [AppController],
-  providers: [AppService, LoggerMiddleware],
+  providers: [AppService, LoggerMiddleware,],
 })
 export class AppModule {}

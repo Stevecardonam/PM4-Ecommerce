@@ -11,16 +11,18 @@ export class UsersService {
     private readonly userRepository: Repository<Users>,
   ) {}
 
-  async getUsers(page: number, limit: number): Promise<Partial<Users>[]> {
-    const allUsers = await this.userRepository.find();
+  async getUsers(page: number, limit: number) {
+    let users = await this.userRepository.find();
 
     const start = (page - 1) * limit;
     const end = start + limit;
 
-    return allUsers.slice(start, end).map(({ password, ...user }) => user);
+    users = users.slice(start, end);
+
+    return users.map(({ password, ...user }) => user);
   }
 
-  async getUser(id: string): Promise<Partial<Users>> {
+  async getUser(id: string) {
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
@@ -43,5 +45,5 @@ export class UsersService {
     if (result.affected === 0) {
       throw new NotFoundException('User not found');
     }
-}
+  }
 }

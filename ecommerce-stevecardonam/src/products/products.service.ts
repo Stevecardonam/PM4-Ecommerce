@@ -99,7 +99,7 @@ export class ProductsService {
       newProduct.description = element.description;
       newProduct.price = element.price;
       newProduct.stock = element.stock;
-      newProduct.imgUrl = element.imgUrl ?? '';
+      newProduct.imgUrl = element.imgUrl;
       newProduct.category = category!;
 
       return newProduct;

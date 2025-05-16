@@ -10,23 +10,23 @@ import {
 export class CreateProductDto {
   @IsNotEmpty()
   @IsString()
-  name?: string;
+  name: string;
 
   @IsNotEmpty()
   @IsString()
-  description?: string;
+  description: string;
 
   @IsNotEmpty()
   @IsNumber()
-  price?: number;
+  price: number;
 
   @IsNotEmpty()
   @IsBoolean()
-  stock?: number;
+  stock: number;
 
   @IsOptional()
   @IsString()
-  imgUrl?: string;
+  imgUrl: string;
 
   @IsUUID()
   categoryId: string;

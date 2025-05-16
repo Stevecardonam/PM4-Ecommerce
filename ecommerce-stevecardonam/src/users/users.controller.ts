@@ -15,7 +15,7 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
-
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(
@@ -23,7 +23,6 @@ export class UsersController {
     private readonly authService: AuthService,
   ) {}
 
-  @UseGuards(AuthGuard)
   @Get()
   getUsers(@Query('page') page = 1, @Query('limit') limit = 5) {
     return this.usersService.getUsers(page, limit);

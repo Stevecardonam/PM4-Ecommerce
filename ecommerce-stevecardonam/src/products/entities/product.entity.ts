@@ -37,7 +37,7 @@ export class Products {
   @Column('text', {
     default: 'No image',
   })
-  imgUrl: string;
+  imgUrl?: string;
 
   @ManyToOne(() => Categories, (category) => category.products)
   @JoinColumn({ name: 'category_id' })
