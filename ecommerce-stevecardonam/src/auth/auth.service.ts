@@ -29,7 +29,7 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const { password, ...cleanUser } = newUser;
+    const { password, isAdmin, ...cleanUser } = newUser;
     return cleanUser;
   }
 

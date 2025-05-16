@@ -9,10 +9,15 @@ import {
   Query,
   HttpStatus,
   ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Roles } from 'src/decorators/roles.decorator';
+import { Role } from 'src/roles.enum';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { RolesGuard } from 'src/auth/guard/roles.guard';
 
 @Controller('products')
 export class ProductsController {
@@ -24,10 +29,11 @@ export class ProductsController {
   }
 
   @Get()
-  getProducts(@Query('page') page: string, @Query('limit') limit: string) {
-    const pageNum = parseInt(page) || 1;
-    const limitNum = parseInt(limit) || 3;
-    return this.productsService.getProducts(pageNum, limitNum);
+  getProducts(@Query('page') page: number, @Query('limit') limit: number) {
+    if (page && limit) {
+      return this.productsService.getProducts(page, limit);
+    }
+    return this.productsService.getProducts(1, 5);
   }
 
   @Get(':id')
@@ -43,7 +49,8 @@ export class ProductsController {
     const result = await this.productsService.create(createProductDto);
     return { statusCode: HttpStatus.CREATED, ...result };
   }
-
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
   @Put(':id')
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
