@@ -37,11 +37,13 @@ export class UsersController {
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard)
   getUser(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.getUser(id);
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard)
   update(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -50,6 +52,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard)
   async deleteUser(@Param('id', new ParseUUIDPipe()) id: string) {
     await this.usersService.deleteUser(id);
     return { id };

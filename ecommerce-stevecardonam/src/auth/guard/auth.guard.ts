@@ -38,7 +38,6 @@ export class AuthGuard implements CanActivate {
       user.exp = new Date(user.exp * 1000);
       user.iat = new Date(user.iat * 1000);
 
-      console.log(user);
     } catch (err) {
       throw new UnauthorizedException('Invalid token');
     }
