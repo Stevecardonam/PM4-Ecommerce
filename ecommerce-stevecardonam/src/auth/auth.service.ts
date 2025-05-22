@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Users } from 'src/users/entities/user.entity';
-import { CreateUserDto, LoginDto } from 'src/users/dto/create-user.dto';
+import { CreateUserDto } from '../users/dto/User.dto';
+import { LoginDto } from '../users/dto/User.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
@@ -34,7 +35,7 @@ export class AuthService {
   }
 
   async signIn(credentials: LoginDto) {
-    const findUser = await this.userRepository.findOneBy({
+    const findUser: Users | null = await this.userRepository.findOneBy({
       email: credentials.email,
     });
 

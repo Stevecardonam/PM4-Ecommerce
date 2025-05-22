@@ -1,10 +1,5 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { CreateProductDto } from './dto/create-product.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { UpdateProductDto } from './dto/create-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Products } from './entities/product.entity';
 import { Repository } from 'typeorm';
@@ -20,7 +15,7 @@ export class ProductsService {
     private readonly categoriesRepository: Repository<Categories>,
   ) {}
 
-  async getProducts(page = 1, limit = 5): Promise<Products[]> {
+  async getProducts(page: number, limit: number): Promise<Products[]> {
     const [products] = await this.productRepository.findAndCount({
       relations: ['category'],
       skip: (page - 1) * limit,
@@ -43,48 +38,20 @@ export class ProductsService {
     return product;
   }
 
-  async create(dto: CreateProductDto): Promise<{ id: string }> {
-    const category = await this.categoriesRepository.findOne({
-      where: { id: dto.categoryId },
+  async update(
+    id: string,
+    UpdateProductDto: UpdateProductDto,
+  ): Promise<Products> {
+    const product = await this.productRepository.preload({
+      id,
+      ...UpdateProductDto,
     });
-
-    if (!category) {
-      throw new BadRequestException('Invalid category ID');
-    }
-
-    const newProduct = this.productRepository.create({ ...dto, category });
-
-    const savedProduct = await this.productRepository.save(newProduct);
-    return { id: savedProduct.id };
-  }
-  async update(id: string, dto: UpdateProductDto): Promise<{ id: string }> {
-    const product = await this.productRepository.findOne({ where: { id } });
     if (!product) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
+    const updateProduct = await this.productRepository.save(product);
 
-    if (dto.categoryId) {
-      const category = await this.categoriesRepository.findOne({
-        where: { id: dto.categoryId },
-      });
-      if (!category) {
-        throw new BadRequestException('Invalid category ID');
-      }
-      product.category = category;
-    }
-
-    Object.assign(product, dto);
-    await this.productRepository.save(product);
-    return { id };
-  }
-
-  async remove(id: string): Promise<{ id: string }> {
-    const product = await this.productRepository.findOne({ where: { id } });
-    if (!product) {
-      throw new NotFoundException(`Product with id ${id} not found`);
-    }
-    await this.productRepository.remove(product);
-    return { id };
+    return updateProduct;
   }
 
   async seed(): Promise<string> {

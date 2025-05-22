@@ -23,6 +23,19 @@ export class OrdersService {
     @InjectRepository(OrderDetails)
     private readonly orderDetailsRepository: Repository<OrderDetails>,
   ) {}
+
+  async findOne(id: string) {
+    const order = await this.orderRepository.find({
+      where: { id },
+      relations: { orderDetails: { products: true } },
+    });
+
+    if (!order || order.length === 0) {
+      throw new NotFoundException('Order not found');
+    }
+
+    return order;
+  }
   async create(userId: string, productsIds: string[]) {
     const user: Users | null = await this.userRepository.findOneBy({
       id: userId,
@@ -79,7 +92,7 @@ export class OrdersService {
   async update(orderId: string, updateOrderDto: CreateOrderDto) {
     const order = await this.orderRepository.findOne({
       where: { id: orderId },
-      relations: { orderDetails: true },
+      relations: { orderDetails: { products: true } },
     });
 
     if (!order) {
@@ -93,6 +106,15 @@ export class OrdersService {
       throw new NotFoundException('User not found');
     }
 
+    const previousProducts = order.orderDetails.products;
+
+    for (const product of previousProducts) {
+      await this.productRepository.update(
+        { id: product.id },
+        { stock: product.stock + 1 },
+      );
+    }
+
     let total = 0;
     const products = await Promise.all(
       updateOrderDto.products.map(async (id) => {
@@ -101,9 +123,14 @@ export class OrdersService {
           throw new NotFoundException(`Product with id ${id} not found`);
         }
         if (product.stock <= 0) {
-          throw new BadRequestException('Product out of stock');
+          throw new BadRequestException(`Product ${product.name} out of stock`);
         }
         total += Number(product.price);
+
+        await this.productRepository.update(
+          { id: product.id },
+          { stock: product.stock - 1 },
+        );
         return product;
       }),
     );
@@ -119,36 +146,7 @@ export class OrdersService {
 
     return await this.orderRepository.find({
       where: { id: order.id },
-      relations: { orderDetails: true },
+      relations: { orderDetails: { products: true } },
     });
-  }
-
-  async findAll() {
-    return await this.orderRepository.find({
-      relations: { orderDetails: { products: true }},
-    });
-  }
-
-  async findOne(id: string) {
-    const order = await this.orderRepository.find({
-      where: { id },
-      relations: { orderDetails: { products: true }},
-    });
-
-    if (!order || order.length === 0) {
-      throw new NotFoundException('Order not found');
-    }
-
-    return order;
-  }
-
-  async remove(id: string) {
-    const order = await this.orderRepository.findOneBy({ id });
-    if (!order) {
-      throw new NotFoundException('Order not found');
-    }
-
-    await this.orderRepository.remove(order);
-    return { message: 'Order deleted' };
   }
 }

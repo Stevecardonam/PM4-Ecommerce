@@ -1,11 +1,5 @@
-import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  IsBoolean,
-  IsNotEmpty,
-  IsUUID,
-} from 'class-validator';
+import { PickType } from '@nestjs/swagger';
+import { IsOptional, IsString, IsNumber, IsNotEmpty } from 'class-validator';
 
 export class CreateProductDto {
   @IsNotEmpty()
@@ -21,13 +15,18 @@ export class CreateProductDto {
   price: number;
 
   @IsNotEmpty()
-  @IsBoolean()
+  @IsNumber()
   stock: number;
 
   @IsOptional()
   @IsString()
   imgUrl: string;
-
-  @IsUUID()
-  categoryId: string;
 }
+
+export class UpdateProductDto extends PickType(CreateProductDto, [
+  'name',
+  'description',
+  'price',
+  'stock',
+  'imgUrl',
+]) {}

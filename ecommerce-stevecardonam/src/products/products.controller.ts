@@ -1,23 +1,21 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Put,
   Param,
-  Delete,
   Query,
   HttpStatus,
   ParseUUIDPipe,
   UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { UpdateProductDto } from './dto/create-product.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/roles.enum';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('products')
 export class ProductsController {
@@ -31,7 +29,7 @@ export class ProductsController {
   @Get()
   getProducts(@Query('page') page: number, @Query('limit') limit: number) {
     if (page && limit) {
-      return this.productsService.getProducts(page, limit);
+      return this.productsService.getProducts(+page, +limit);
     }
     return this.productsService.getProducts(1, 5);
   }
@@ -44,11 +42,8 @@ export class ProductsController {
       data: product,
     };
   }
-  @Post()
-  async create(@Body() createProductDto: CreateProductDto) {
-    const result = await this.productsService.create(createProductDto);
-    return { statusCode: HttpStatus.CREATED, ...result };
-  }
+
+  @ApiBearerAuth()
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   @Put(':id')
@@ -58,17 +53,8 @@ export class ProductsController {
   ) {
     const result = await this.productsService.update(id, updateProductDto);
     return {
-      statusCode: HttpStatus.OK,
-      ...result,
-    };
-  }
-
-  @Delete(':id')
-  async remove(@Param('id', new ParseUUIDPipe()) id: string) {
-    const result = await this.productsService.remove(id);
-    return {
-      statusCode: HttpStatus.OK,
-      ...result,
+      message: 'Product updated successfully',
+      product: result,
     };
   }
 }

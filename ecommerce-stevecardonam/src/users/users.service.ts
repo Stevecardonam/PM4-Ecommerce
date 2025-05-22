@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Users } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateUserDto } from './dto/User.dto';
 
 @Injectable()
 export class UsersService {
@@ -32,18 +32,18 @@ export class UsersService {
     return userWithoutPassword;
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<Users> {
+  async updateUser(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<Partial<Users>> {
     const user = await this.userRepository.preload({ id, ...updateUserDto });
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return await this.userRepository.save(user);
-  }
+    const updateUser = await this.userRepository.save(user);
 
-  async deleteUser(id: string): Promise<void> {
-    const result = await this.userRepository.delete(id);
-    if (result.affected === 0) {
-      throw new NotFoundException('User not found');
-    }
+    const { password, isAdmin, ...safeUser } = updateUser;
+
+    return safeUser;
   }
 }

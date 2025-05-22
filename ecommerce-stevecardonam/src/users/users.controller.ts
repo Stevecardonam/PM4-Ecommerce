@@ -1,23 +1,21 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Put,
   Param,
-  Delete,
   Query,
   ParseUUIDPipe,
-  Req,
+  Put,
   UseGuards,
+  Body,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Role } from 'src/roles.enum';
 import { Roles } from 'src/decorators/roles.decorator';
+import { UpdateUserDto } from './dto/User.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
 export class UsersController {
@@ -26,6 +24,7 @@ export class UsersController {
     private readonly authService: AuthService,
   ) {}
 
+  @ApiBearerAuth()
   @Get()
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
@@ -36,12 +35,14 @@ export class UsersController {
     return this.usersService.getUsers(1, 5);
   }
 
+  @ApiBearerAuth()
   @Get(':id')
   @UseGuards(AuthGuard)
   getUser(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.getUser(id);
   }
 
+  @ApiBearerAuth()
   @Put(':id')
   @UseGuards(AuthGuard)
   update(
@@ -49,12 +50,5 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.updateUser(id, updateUserDto);
-  }
-
-  @Delete(':id')
-  @UseGuards(AuthGuard)
-  async deleteUser(@Param('id', new ParseUUIDPipe()) id: string) {
-    await this.usersService.deleteUser(id);
-    return { id };
   }
 }

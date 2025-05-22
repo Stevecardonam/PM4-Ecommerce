@@ -7,7 +7,7 @@ export class CategoriesController {
 
   @Get('seeder')
   create() {
-    return this.categoriesService.create();
+    return this.categoriesService.createSeeder();
   }
 
   @Get()
