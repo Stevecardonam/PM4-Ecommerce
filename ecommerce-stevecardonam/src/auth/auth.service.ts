@@ -6,6 +6,7 @@ import { LoginDto } from '../users/dto/User.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
+import { Role } from 'src/roles.enum';
 
 @Injectable()
 export class AuthService {
@@ -28,9 +29,10 @@ export class AuthService {
     const newUser = await this.userRepository.save({
       ...userWithoutPassword,
       password: hashedPassword,
+      Roles: [Role.User],
     });
 
-    const { password, isAdmin, ...cleanUser } = newUser;
+    const { password, Roles, ...cleanUser } = newUser;
     return cleanUser;
   }
 
@@ -55,7 +57,7 @@ export class AuthService {
     const payload = {
       id: findUser.id,
       email: findUser.email,
-      isAdmin: findUser.isAdmin,
+      roles: findUser.Roles,
     };
 
     const token = this.jwtService.sign(payload);

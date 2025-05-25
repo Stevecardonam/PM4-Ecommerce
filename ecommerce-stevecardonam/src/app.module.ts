@@ -12,6 +12,7 @@ import typeorm from './config/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { FileUploadModule } from './file-upload/file-upload.module';
+import { SeederService } from './seeder.service';
 
 @Module({
   imports: [
@@ -36,6 +37,6 @@ import { FileUploadModule } from './file-upload/file-upload.module';
     FileUploadModule,
   ],
   controllers: [AppController],
-  providers: [AppService, LoggerMiddleware,],
+  providers: [AppService, LoggerMiddleware, SeederService],
 })
 export class AppModule {}

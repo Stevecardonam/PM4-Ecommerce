@@ -1,3 +1,4 @@
+import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import {
   IsString,
@@ -72,12 +73,4 @@ export class CreateUserDto {
 
 export class LoginDto extends PickType(CreateUserDto, ['email', 'password']) {}
 
-export class UpdateUserDto extends PickType(CreateUserDto, [
-  'name',
-  'email',
-  'password',
-  'address',
-  'phone',
-  'country',
-  'city',
-]) {}
+export class UpdateUserDto extends PartialType(CreateUserDto) {}

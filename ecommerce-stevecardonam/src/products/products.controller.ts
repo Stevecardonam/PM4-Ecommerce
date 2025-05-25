@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { UpdateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { Role } from 'src/roles.enum';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
@@ -23,7 +23,7 @@ export class ProductsController {
 
   @Get('seeder')
   seedProducts() {
-    return this.productsService.seed();
+    return this.productsService.addProducts();
   }
 
   @Get()

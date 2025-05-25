@@ -23,13 +23,22 @@ export class UsersService {
   }
 
   async getUser(id: string) {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['orders'],
+    });
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    const { password, isAdmin, ...userWithoutPassword } = user;
-    return userWithoutPassword;
+    const { password, Roles, orders, ...userWithout } = user;
+
+    const simplyOrder = orders.map(({ id, date }) => ({ id, date }));
+
+    return {
+      ...userWithout,
+      orders: simplyOrder,
+    };
   }
 
   async updateUser(
@@ -42,7 +51,7 @@ export class UsersService {
     }
     const updateUser = await this.userRepository.save(user);
 
-    const { password, isAdmin, ...safeUser } = updateUser;
+    const { password, Roles, ...safeUser } = updateUser;
 
     return safeUser;
   }

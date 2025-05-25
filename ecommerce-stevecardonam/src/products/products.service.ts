@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UpdateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Products } from './entities/product.entity';
 import { Repository } from 'typeorm';
@@ -54,32 +54,44 @@ export class ProductsService {
     return updateProduct;
   }
 
-  async seed(): Promise<string> {
-    const categories: Categories[] = await this.categoriesRepository.find();
+  async addProducts() {
+    const categories = await this.categoriesRepository.find();
 
-    const products: Products[] = data.map((element) => {
-      const category: Categories | undefined = categories.find(
-        (category) => element.category === category.name,
+    if (!categories.length) {
+      return 'There are no categories, run the seed for categories first';
+    }
+
+    const products = data.map((element) => {
+      const category = categories.find(
+        (cat) => cat.name.toLowerCase() === element.category.toLowerCase(),
       );
-      const newProduct = new Products();
-      newProduct.name = element.name;
-      newProduct.description = element.description;
-      newProduct.price = element.price;
-      newProduct.stock = element.stock;
-      newProduct.imgUrl = element.imgUrl;
-      newProduct.category = category!;
 
-      return newProduct;
+      if (!category) {
+        throw new NotFoundException(`Category ${element.category} not found`);
+      }
+
+      const product = new Products();
+      product.name = element.name;
+      product.description = element.description;
+      product.price = element.price;
+      product.stock = element.stock;
+      product.imgUrl = element.imgUrl;
+      product.category = category;
+
+      return product;
     });
 
-    await this.categoriesRepository
+    await this.productRepository
       .createQueryBuilder()
       .insert()
       .into(Products)
       .values(products)
-      .orIgnore()
+      .orUpdate(
+        ['description', 'price', 'stock', 'imgUrl', 'category_id'],
+        ['name'],
+      )
       .execute();
 
-    return 'This action adds products';
+    return 'Products seeded successfully';
   }
 }

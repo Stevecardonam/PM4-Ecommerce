@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Put,
   Param,
   ParseUUIDPipe,
   UseGuards,
@@ -21,7 +20,7 @@ export class OrdersController {
   @Get(':id')
   @UseGuards(AuthGuard)
   findOne(@Param('id', new ParseUUIDPipe()) id: string) {
-    return this.ordersService.findOne(id);
+    return this.ordersService.getOrder(id);
   }
 
   @ApiBearerAuth()
@@ -29,16 +28,7 @@ export class OrdersController {
   @UseGuards(AuthGuard)
   create(@Body() createOrderDto: CreateOrderDto) {
     const { userId, products } = createOrderDto;
-    return this.ordersService.create(userId, products);
-  }
-
-  @ApiBearerAuth()
-  @Put(':id')
-  @UseGuards(AuthGuard)
-  update(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updateOrderDto: CreateOrderDto,
-  ) {
-    return this.ordersService.update(id, updateOrderDto);
+    const productsIds = products.map((product) => product.id);
+    return this.ordersService.addOrder(userId, productsIds);
   }
 }

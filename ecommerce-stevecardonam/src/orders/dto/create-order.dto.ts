@@ -1,10 +1,11 @@
-import { IsUUID, IsArray, IsNotEmpty } from 'class-validator';
+import { IsUUID, IsArray, IsNotEmpty, ArrayMinSize } from 'class-validator';
 
 export class CreateOrderDto {
   @IsUUID()
   @IsNotEmpty()
   userId: string;
 
+  @ArrayMinSize(1)
   @IsArray()
-  products: string[];
+  products: { id: string }[];
 }

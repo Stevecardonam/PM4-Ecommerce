@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
-import { Role } from 'src/roles.enum';
+
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -28,19 +28,15 @@ export class AuthGuard implements CanActivate {
       const secret = process.env.JWT_SECRET;
       const user = this.jwtService.verify(token, { secret });
 
-      if (user.isAdmin) {
-        user.roles = [Role.Admin];
-      } else {
-        user.roles = [Role.User];
-      }
-
-      req.user = user;
-
-      user.exp = new Date(user.exp * 1000);
-      user.iat = new Date(user.iat * 1000);
+      req.user = {
+        ...user,
+        exp: new Date(user.exp * 1000),
+        iat: new Date(user.iat * 1000),
+      };
     } catch (err) {
       throw new UnauthorizedException('Invalid token');
     }
+
     return true;
   }
 }

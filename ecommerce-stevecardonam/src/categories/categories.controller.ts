@@ -7,11 +7,11 @@ export class CategoriesController {
 
   @Get('seeder')
   create() {
-    return this.categoriesService.createSeeder();
+    return this.categoriesService.addCategories();
   }
 
   @Get()
   findAll() {
-    return this.categoriesService.findAll();
+    return this.categoriesService.getCategories();
   }
 }

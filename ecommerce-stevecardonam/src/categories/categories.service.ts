@@ -10,7 +10,7 @@ export class CategoriesService {
     @InjectRepository(Categories)
     private readonly categoriesRepository: Repository<Categories>,
   ) {}
-  async createSeeder(): Promise<string> {
+  async addCategories(): Promise<string> {
     const categoriesNames = new Set(data.map((element) => element.category));
     const categoriesArray = Array.from(categoriesNames);
     const categories = categoriesArray.map((category) => ({ name: category }));
@@ -26,7 +26,7 @@ export class CategoriesService {
     return 'This action adds a new category';
   }
 
-  async findAll() {
+  async getCategories() {
     return await this.categoriesRepository.find();
   }
 }
