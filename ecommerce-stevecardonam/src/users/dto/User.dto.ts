@@ -18,17 +18,12 @@ export class CreateUserDto {
   @MaxLength(80)
   name: string;
 
-  
-  /**
-   * @example 'John@example.com'
-   */
+  @ApiProperty({ example: 'John@example.com' })
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
-   /**
-   * @example 'Password1!'
-   */
+  @ApiProperty({ example: 'Password1!' })
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,15}$/, {
     message:
       'Password must include upper/lowercase letters, a number, a special character (!@#$%^&*), and be 8-15 characters long',
@@ -73,4 +68,3 @@ export class CreateUserDto {
 
 export class LoginDto extends PickType(CreateUserDto, ['email', 'password']) {}
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {}

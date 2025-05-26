@@ -4,9 +4,7 @@ import {
   Param,
   Query,
   ParseUUIDPipe,
-  Put,
   UseGuards,
-  Body,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthService } from 'src/auth/auth.service';
@@ -14,7 +12,6 @@ import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { RolesGuard } from 'src/auth/guard/roles.guard';
 import { Role } from 'src/roles.enum';
 import { Roles } from 'src/decorators/roles.decorator';
-import { UpdateUserDto } from './dto/User.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
@@ -40,15 +37,5 @@ export class UsersController {
   @UseGuards(AuthGuard)
   getUser(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.usersService.getUser(id);
-  }
-
-  @ApiBearerAuth()
-  @Put(':id')
-  @UseGuards(AuthGuard)
-  update(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.usersService.updateUser(id, updateUserDto);
   }
 }
