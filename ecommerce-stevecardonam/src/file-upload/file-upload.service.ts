@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { FileUploadRepository } from './file-upload.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Products } from 'src/products/entities/product.entity';
@@ -15,7 +15,7 @@ export class FileUploadService {
   async uploadImage(file: Express.Multer.File, productId: string) {
     const product = await this.productsRepository.findOneBy({ id: productId });
     if (!product) {
-      throw new Error('Product not found');
+      throw new ForbiddenException('Product not found');
     }
     const uploadResponse = await this.fileUpLoadRepository.uploadImage(file);
 

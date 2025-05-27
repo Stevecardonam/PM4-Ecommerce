@@ -16,7 +16,11 @@ export class AuthService {
   ) {}
 
   async signUp(user: CreateUserDto) {
-    const { confirmPassword, ...userWithoutPassword } = user;
+    const { confirmPassword, password, ...rest } = user;
+
+    if (password !== confirmPassword) {
+      throw new BadRequestException('Passwords do not match');
+    }
 
     const findUser = await this.userRepository.findOneBy({ email: user.email });
 
@@ -27,12 +31,12 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(user.password, 10);
 
     const newUser = await this.userRepository.save({
-      ...userWithoutPassword,
+      ...rest,
       password: hashedPassword,
       Roles: [Role.User],
     });
 
-    const { password, Roles, ...cleanUser } = newUser;
+    const { password: _, Roles, ...cleanUser } = newUser;
     return cleanUser;
   }
 
